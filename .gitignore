@@ -1,2 +1,4 @@
 docs/
 docs_txt/
+chroma_db/
+__pycache__/
