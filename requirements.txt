@@ -7,3 +7,4 @@ uvicorn
 mcp-cli
 python-dotenv
 google-generativeai
+chromadb
