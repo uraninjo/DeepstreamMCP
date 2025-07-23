@@ -2,3 +2,5 @@ requests
 beautifulsoup4
 readability-lxml
 chromadb
+fastapi
+uvicorn
