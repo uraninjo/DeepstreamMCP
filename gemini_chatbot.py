@@ -8,13 +8,14 @@ import os
 import sys
 import google.generativeai as genai
 from dotenv import load_dotenv
+import warnings
+warnings.simplefilter("ignore")
 
 load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel("gemini-2.5-flash")
-
 
 async def call_mcp_tool(session, tool_name, params):
     t0 = time.perf_counter()
@@ -46,22 +47,28 @@ async def main():
         print(f"[Timing] MCP: stdio_client={t1-t0:.3f}s, ClientSession={t2-t1:.3f}s, initialize={t3-t2:.3f}s, total_setup={t3-t0:.3f}s")
         print("Gemini + MCP Chatbot started. Type 'quit' to exit.")
 
+        # ANSI color codes
+        COLOR_USER = '\033[96m'      # Cyan
+        COLOR_MCP = '\033[93m'       # Yellow
+        COLOR_GEMINI = '\033[92m'    # Green
+        COLOR_RESET = '\033[0m'
+
         while True:
-            user_input = input("\nYou: ")
+            user_input = input(f"\n{COLOR_USER}You: {COLOR_RESET}")
             if user_input.lower() == "quit":
                 break
             # Time MCP tool call
             t_mcp_start = time.perf_counter()
             mcp_result = await call_mcp_tool(session, "search_docs", {"query": user_input})
             t_mcp_end = time.perf_counter()
-            # print(f"\n[MCP Response]: {mcp_result}")
+            # print(f"{COLOR_MCP}[MCP Response]: {mcp_result}{COLOR_RESET}")
             print(f"[Timing] Total MCP call: {t_mcp_end-t_mcp_start:.3f}s")
             # Time Gemini call
             t_gemini_start = time.perf_counter()
             prompt = f"User message: {user_input}\n\nMCP response: {mcp_result}\n\nReply in a way that helps the user."
             gemini_response = model.generate_content(prompt)
             t_gemini_end = time.perf_counter()
-            print(f"\n[Gemini]: {gemini_response.text}")
+            print(f"{COLOR_GEMINI}[Gemini]: {gemini_response.text}{COLOR_RESET}")
             print(f"[Timing] Gemini call: {t_gemini_end-t_gemini_start:.3f}s")
 
 if __name__ == "__main__":
