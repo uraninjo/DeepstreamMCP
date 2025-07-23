@@ -4,3 +4,6 @@ readability-lxml
 chromadb
 fastapi
 uvicorn
+mcp-cli
+python-dotenv
+google-generativeai
